@@ -1,0 +1,6 @@
+div.box {
+	width: 150px;
+	height: 150px;
+	border-radius: 10px;
+	background-color: rgba(75,75,75,.75);
+}

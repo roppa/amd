@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>AMD</title>
+		<meta charset="utf-8" />
+
+	</head>
+	<body>
+
+		<div class="box"></div>
+		<div class="box"></div>
+		<div class="box"></div>
+		<div class="box"></div>
+
+		<script type="text/javascript">
+
+			window.head = document.getElementsByTagName('head')[0];
+			
+			var config = config || {}
+			
+			config.files = [
+				{
+					url: 'style.css'
+				}, {
+					url: 'style2.css'
+				}, {
+					url: 'asdfsdf.js'
+				}, {
+					url: 'functions.js'
+				}
+			];
+
+			function urlExists(url, callback, err) {
+				var http = new XMLHttpRequest();
+				http.open('HEAD', url, false);
+				http.send();
+				if (http.status !== 404) {
+					callback();
+				} else {
+					err();
+				}
+			}			
+			
+			var loadFile = function (index) {
+				if (typeof config.files[index].exports === 'undefined' || (typeof config.files[index].exports !== 'undefined' && !window[config.files[index].exports])) {
+					var filetype = config.files[index].url.split('.').pop().toLowerCase(), file;
+					if(filetype === 'css') {
+						file = document.createElement('link');
+						file.rel = "stylesheet";
+						file.href = config.files[index].url;
+					} else if (filetype === 'js') {
+						file = document.createElement('script');
+						file.src = config.files[index].url;
+					}
+					//when the script has loaded, load the next dependency
+					file.onreadystatechange = file.onload = function () {
+						if (index + 1 < config.files.length) {
+							loadFile(index + 1);
+						}
+					};
+					
+					urlExists(file.src || file.href, function () {
+						head.appendChild(file);
+					}, function () {
+						console.log('error loading file, do the error callback or call next file:');
+						if (index + 1 < config.files.length) {
+							loadFile(index + 1);
+						}
+					});
+					
+				} else {
+					if (index + 1 < config.files.length) {
+						loadFile(index + 1);
+					}
+				}
+			};
+	
+			loadFile(0);
+				
+		</script>
+
+	</body>
+</html>
